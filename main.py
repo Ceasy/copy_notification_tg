@@ -54,9 +54,9 @@ async def copy_and_notify(src, dest_folder, progress_var, bot, chat_id, progress
     host_identifier = platform.node()
     success = copy_files(src, dest_folder, progress_var, progress_bar, cancel_var)
     if success:
-        await send_telegram_message(bot, chat_id, f"Successfully copied: {src} from host {host_identifier}")
+        await send_telegram_message(bot, chat_id, f"✅Successfully copied: {src} \n💻from host: {host_identifier}")
     else:
-        error_message = f"Error copying file <code>{src}</code> on host {host_identifier}:\n<pre>{traceback.format_exc()}</pre>"
+        error_message = f"❌Error copying file <code>{src}</code>\n💻on host: {host_identifier}:\n<pre>{traceback.format_exc()}</pre>"
         await send_telegram_message(bot, chat_id, error_message)
 
 
