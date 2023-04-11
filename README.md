@@ -27,7 +27,24 @@ This Python script copies files and folders to a specified destination and sends
 ```bash
 pip install aiogram cryptography 
 ```
-3. Replace the following variables in the main script (main.py) with your encrypted bot token, chat ID, and encryption key:
+
+3. In the file `crypt.py` you need to write your data:
+```bash
+bot_token = "your_bot_token_here"
+chat_id = "your_chat_id_here"
+```
+4. Run the script:
+```bash
+python crypt.py
+```
+5. On the command line you should see your encrypted data. You need to write them down in order to apply them later:
+```bash
+key = b'your_key_here'
+encrypted_bot_token = b'your_encrypted_bot_token_here'
+encrypted_chat_id = b'your_encrypted_chat_id_here'
+```
+
+6. Replace the following variables in the main script (main.py) with your encrypted bot token, chat ID, and encryption key:
 
 ```bash
 key = b'your_key_here'
@@ -37,13 +54,13 @@ encrypted_chat_id = b'your_encrypted_chat_id_here'
 
 Follow the instructions in the "Encrypting sensitive data" section below to obtain these values.
 
-4. Run the script:
+7. Run the script:
 
 ```bash
 python main.py
 ```
 
-5. Use the graphical interface to select files and folders, set a destination, and start the copying process.
+8. Use the graphical interface to select files and folders, set a destination, and start the copying process.
 
 
 ## Encrypting sensitive data
