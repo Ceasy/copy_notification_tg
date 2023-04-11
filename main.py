@@ -1,6 +1,5 @@
 import os
 import shutil
-# import configparser
 import tkinter as tk
 from tkinter import ttk, filedialog
 from aiogram import Bot, Dispatcher, types
@@ -8,6 +7,8 @@ from aiogram.types import ParseMode
 from threading import Thread
 from cryptography.fernet import Fernet
 import asyncio
+import platform
+import traceback
 
 
 async def send_telegram_message(bot, chat_id, message):
@@ -26,31 +27,41 @@ def run_asyncio_coroutine(coroutine):
 
 
 def copy_files(src, dest_folder, progress_var, progress_bar, cancel_var):
-    if os.path.isdir(src):
-        dest = os.path.join(dest_folder, os.path.basename(src))
-        shutil.copytree(src, dest)
-    else:
-        dest = os.path.join(dest_folder, os.path.basename(src))
-        total_size = os.path.getsize(src)
-        copied_bytes = 0
+    try:
+        if os.path.isdir(src):
+            dest = os.path.join(dest_folder, os.path.basename(src))
+            shutil.copytree(src, dest)
+        else:
+            dest = os.path.join(dest_folder, os.path.basename(src))
+            total_size = os.path.getsize(src)
+            copied_bytes = 0
 
-        with open(src, "rb") as src_file:
-            with open(dest, "wb") as dest_file:
-                buf = src_file.read(1024 * 1024)
-                while buf and not cancel_var.get():
-                    dest_file.write(buf)
-                    copied_bytes += len(buf)
-                    progress_var.set((copied_bytes / total_size) * 100)
-                    progress_bar.update_idletasks()
+            with open(src, "rb") as src_file:
+                with open(dest, "wb") as dest_file:
                     buf = src_file.read(1024 * 1024)
+                    while buf and not cancel_var.get():
+                        dest_file.write(buf)
+                        copied_bytes += len(buf)
+                        progress_var.set((copied_bytes / total_size) * 100)
+                        progress_bar.update_idletasks()
+                        buf = src_file.read(1024 * 1024)
+        return True
+    except Exception as e:
+        return False
 
 
 async def copy_and_notify(src, dest_folder, progress_var, bot, chat_id, progress_bar, cancel_var):
-    copy_files(src, dest_folder, progress_var, progress_bar, cancel_var)
-    await send_telegram_message(bot, chat_id, f"Successfully copied: {src}")
+    host_identifier = platform.node()
+    success = copy_files(src, dest_folder, progress_var, progress_bar, cancel_var)
+    if success:
+        await send_telegram_message(bot, chat_id, f"Successfully copied: {src} from host {host_identifier}")
+    else:
+        error_message = f"Error copying file <code>{src}</code> on host {host_identifier}:\n<pre>{traceback.format_exc()}</pre>"
+        await send_telegram_message(bot, chat_id, error_message)
 
 
-async def start_copy(entries, bot, chat_id, progress_var, cancel_var, start_button, cancel_button, progress_bar, file_info_var):
+async def start_copy(entries, bot, chat_id, progress_var, cancel_var, start_button, cancel_button, progress_bar,
+                     file_info_var):
     src_paths = entries[0].get().split(',')
     dest_folder = entries[1].get()
 
@@ -125,18 +136,13 @@ def select_directory(entry):
     entry.insert(0, folder_name)
 
 
-async def on_start_click(entries, bot, chat_id, progress_var, cancel_var, start_button, cancel_button, progress_bar, file_info_var):
-    await start_copy(entries, bot, chat_id, progress_var, cancel_var, start_button, cancel_button, progress_bar, file_info_var)
-
+async def on_start_click(entries, bot, chat_id, progress_var, cancel_var, start_button, cancel_button, progress_bar,
+                         file_info_var):
+    await start_copy(entries, bot, chat_id, progress_var, cancel_var, start_button, cancel_button, progress_bar,
+                     file_info_var)
 
 
 def main():
-    # config = configparser.ConfigParser()
-    # config.read("config.ini")
-
-    # token_bot = config.get("Telegram", "token_bot")
-    # chat_id = int(config.get("Telegram", "chat_id"))
-
     key = b'your_key_here'
     encrypted_bot_token = b'your_encrypted_bot_token_here'
     encrypted_chat_id = b'your_encrypted_chat_id_here'
@@ -160,4 +166,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
