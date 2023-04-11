@@ -53,3 +53,5 @@ To keep your bot token and chat ID secure, you can use the cryptography library 
 ## Converting the script to an executable
 
 If you want to convert your script into an executable, you can use tools like `PyInstaller` or `cx_Freeze`. Keep in mind that the encrypted sensitive data will be included in the executable, which could be reverse-engineered by a determined attacker. While encrypting the data adds a layer of security, it is not foolproof.
+- Чтобы пофиксить ошибку `pkg_resources.DistributionNotFound: The 'magic_filter' distribution was not found and is required by the application` при конвертации в 'exe' с помошью 'Auto-py-to-exe' необходимо:
+1. В 'Advanced' в поле '--copy-metadata' указать "magic_filter".
